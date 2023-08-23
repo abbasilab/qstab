@@ -6,7 +6,7 @@ requires = [
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "cluster"
+name = "qstab"
 authors = [{name = "people", email = "abbasilabucsf@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
