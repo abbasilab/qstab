@@ -82,3 +82,32 @@ class Entity:
         ent_types = [linker.kb.semantic_type_tree.get_canonical_name(tui) for tui in tuis]
         
         return ent_types
+    
+
+
+    class Annotation:
+        ''' Paired token texts and labels. The labels can be numbers indicating types or type unique identifiers (TUIs) if the associated entities follow the UMLS convention.
+        '''
+    
+    def __init__(self, texts, labels):
+        
+        self.texts = texts
+        self.labels = labels
+        self.len = len(labels)
+        
+        if len(self.text) != self.len:
+            raise ValueError("The number of texts and labels should be the same!")
+        
+    def to_dict(self, keys="type"):
+        
+        if keys == "text":
+            return dict(zip(self.texts, self.labels))
+        elif keys == "type":
+            return {"text":self.texts, "labels":self.labels}
+    
+    def to_tuples(self, keys="type"):
+        
+        if keys == "text":
+            return [(t, l) for (t, l) in zip(self.texts, self.labels)]
+        elif keys == "type":
+            return [tuple(self.texts), tuple(self.labels)]
