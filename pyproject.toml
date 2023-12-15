@@ -7,7 +7,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "qstab"
-authors = [{name = "people", email = "xyz@gmail.com"}]
+authors = [{name = "people"}]
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
@@ -16,11 +16,16 @@ dependencies = [
     "pytest",
     "numpy",
     "scipy",
-    "matplotlib",
+    "tqdm",
+    "thefuzz",
+    "unidecode",
     "scikit-learn",
     "transformers",
-
+    "openai",
+    "google-generativeai",
+    "fastparquet",
 ]
+
 
 [project.urls]
 Home = ""

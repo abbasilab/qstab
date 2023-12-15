@@ -8,6 +8,7 @@ class Question:
     def __init__(
         self,
         question: str,
+        reference: str,
         answer: str,
         options: Dict[str, str],
         answer_idx: str,
@@ -15,6 +16,7 @@ class Question:
         prompt_suffix: Optional[str] = "",
     ):
         self.question = question
+        self.reference = reference
         self.answer = answer
         self.options = options
         self.answer_idx = answer_idx
@@ -24,8 +26,10 @@ class Question:
         self._full_question = None
 
     def _get_full_question(
-        self, prompt_prefix: Optional[str] = None, prompt_suffix: Optional[str] = None
+        self, prompt_prefix: Optional[str] = None,
+        prompt_suffix: Optional[str] = None
     ) -> str:
+        
         if prompt_prefix:
             self.prompt_prefix = prompt_prefix
         if prompt_suffix:
@@ -35,7 +39,6 @@ class Question:
 
         # note that we are putting in a newline between the question and the answers
         full_question = f"""{self.prompt_prefix}{self.question} 
-
 {formatted_answers}
 {self.prompt_suffix}"""
 
@@ -47,7 +50,7 @@ class Question:
         tokenizer: transformers.PreTrainedTokenizer,
         model_kwargs: Optional[Dict[str, Union[str, int]]] = {},
         tokenizer_kwargs: Optional[Dict[str, Union[str, int]]] = {
-            "return_tensors": "pt"
+            "return_tensors": "pt", "max_length":512,
         },
         decode_outputs: bool = True,
     ):
@@ -61,7 +64,7 @@ class Question:
         outputs = model.generate(input_ids, **model_kwargs)
 
         if decode_outputs:
-            return tokenizer.decode(outputs[0])
+            return tokenizer.decode(outputs[0], skip_special_tokens=True)
         else:
             return outputs
 
@@ -81,11 +84,13 @@ class Question:
 
     @property
     def full_question(self):
-        if self._full_question is None:
-            self._get_full_question()
-            return self._full_question
-        else:
-            return self._full_question
+        self._get_full_question()
+        return self._full_question
+#         if self._full_question is None:
+#             self._get_full_question()
+#             return self._full_question
+#         else:
+#             return self._full_question
 
     @classmethod
     def from_series(self, series: Union[pd.Series, pd.DataFrame]):
@@ -95,6 +100,7 @@ class Question:
 
         return self(
             question=series["question"],
+            reference=series["reference"],
             answer=series["answer"],
             options=series["options"],
             answer_idx=series["answer_idx"],
@@ -110,6 +116,7 @@ class Question:
     def from_dict(self, dict: Dict[str, Union[str, dict]]):
         return self(
             question=dict["question"],
+            reference=dict["reference"],
             answer=dict["answer"],
             options=dict["options"],
             answer_idx=dict["answer_idx"],
@@ -120,3 +127,57 @@ class Question:
             if dict.get("prompt_suffix", None)
             else "",
         )
+
+
+class AnswerCollector:
+    
+    def __init__(self, rowvals=[], colnames=["answer"], **kwargs):
+        self.answers = pd.DataFrame(rowvals, columns=colnames, **kwargs)
+    
+    @property
+    def num_entry(self):
+        return self.answers.shape[0]
+    
+    @property
+    def num_collection(self):
+        return len(self.answers.columns)
+        
+    @property
+    def colnames(self):
+        return self.answers.columns.values
+    
+    @classmethod
+    def from_array(self, rowvals, **kwargs):
+        return self(rowvals=rowvals, **kwargs)
+    
+    def add_entry(self, **kwargs):
+        ''' Add a row to the answers dataframe (default values are nan).
+        '''
+        last_index = self.num_entry
+        # self.answers.loc[last_index] = np.nan
+        for k, v in kwargs.items():
+            self.answers.at[last_index, k] = v
+            
+    def remove_entry(self, index):
+        ''' Remove a row from the answer collection.
+        '''
+        self.answers = self.answers.drop(index, axis=0)
+        
+    def add_collection(self, collection, name=None):
+        ''' Add a collection of values for a new column.
+        '''
+        self.answers[name] = collection
+    
+    def remove_collection(self, name):
+        ''' Remove a column from the answer collection.
+        '''
+        self.answers = self.answers.drop(name, axis=1)
+    
+    def clean(self):
+        pass
+    
+    def to_excel(self, filepath, sheet_name='Results', **kwargs):
+        self.answers.to_excel(filepath, sheet_name=sheet_name, **kwargs)
+        
+    def to_csv(self, filepath, **kwargs):
+        self.answers.to_csv(filepath, **kwargs)

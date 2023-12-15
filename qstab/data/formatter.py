@@ -44,4 +44,4 @@ class Formatter:
         if format == "json":
             export_df.to_json(faddress, orient=orient, **kwargs)
         elif format == "dict":
-            return export_df.to_dict(orient=orient, **kwargs)
+            export_df.to_dict(orient=orient, **kwargs)
