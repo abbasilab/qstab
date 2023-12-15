@@ -1,4 +1,5 @@
 import qstab.data as qdata
+# import qstab.perturbations as qptb
 from qstab.perturbations import utils as qutils, sampling as qsamp
 import argparse
 import pandas as pd
@@ -60,10 +61,8 @@ parser.add_argument("-ndist", "--numdistance", metavar="numdistance", nargs="?",
                     help="Power of the distance in the sampling probability weights.")
 parser.add_argument("-nq", "--numq", metavar="numq", nargs="?", type=int,
                     help="Number of questions.")
-parser.add_argument("-temp", "--temperature", metavar="temperature", nargs="?", type=float,
-                    help="Model temperature.")
 parser.set_defaults(perturb=False, perturb_sampling="None", group="drugs",
-                    numdistance=20, numq=10, temperature=0)
+                    numdistance=20, numq=10)
 cli_args = parser.parse_args()
 
 PERTURB = cli_args.perturb
@@ -73,8 +72,7 @@ NDIST = cli_args.numdistance
 if PTB_SAMP == "random":
     NDIST = 0
 NQ = cli_args.numq
-TEMP = cli_args.temperature
-print(PERTURB, PTB_SAMP, GROUP, NDIST, NQ, TEMP)
+print(PERTURB, PTB_SAMP, GROUP, NDIST, NQ)
 
 if PERTURB: # With perturbation
     anscoll = qdata.question.AnswerCollector(colnames=['mod_ans', 'flag',
@@ -89,23 +87,23 @@ if PERTURB: # With perturbation
         tknzer = AutoTokenizer.from_pretrained("GanjinZero/UMLSBert_ENG")
         mod = AutoModel.from_pretrained("GanjinZero/UMLSBert_ENG")
         if GROUP == 'drugs':
-            vecs = np.load(r'./external/drug_word_vecs_umlsBERT.npz')['vecs']
+            vecs = np.load(r'/home/rpxian/Code/Python/drug_word_vecs_umlsBERT.npz')['vecs']
         elif GROUP == 'diseases':
-            vecs = np.load(r'./external/disease_word_vecs_umlsBERT.npz')['vecs']
+            vecs = np.load(r'/home/rpxian/Code/Python/disease_word_vecs_umlsBERT.npz')['vecs']
 else: # No perturbation
     anscoll = qdata.question.AnswerCollector(colnames=['mod_ans', 'flag'])
 
 
 # Load perturbation set
 if GROUP == 'drugs':
-    entities = pd.read_csv(r'./external/FDA_Approved.csv', names=['id', 'name'])
+    entities = pd.read_csv(r'/home/rpxian/Code/Python/FDA_Approved.csv', names=['id', 'name'])
     entity_names = np.array(list(entities['name']))
     type_selector = 'Drugs?'
     choice_type = 'DrugChoices'
     tui_types = tui_drugs
 
 elif GROUP == 'diseases':
-    entities = pd.read_csv(r'./external/CTD_unique_disease_names.csv')
+    entities = pd.read_csv(r'/home/rpxian/Code/Python/CTD_unique_disease_names.csv')
     entity_names = np.array(list(entities['name']))
     type_selector = 'Diseases?'
     choice_type = 'DiseaseChoices'
@@ -113,7 +111,7 @@ elif GROUP == 'diseases':
 
 # Load dataset
 # qa = pd.read_parquet(r'./external/train_drugs.parquet')
-qa = pd.read_parquet(r'./external/medqa_usmle_train_qtyped.parquet')
+qa = pd.read_parquet(r'/home/rpxian/Code/Python/medqa_usmle_train_qtyped.parquet')
 qad = qdata.formatter.Formatter(qa).df
 qadf = qad[qad[type_selector]==True] # Select the disease or drug-related questions
 nqs = len(qadf)
@@ -123,7 +121,7 @@ if NQ > nqs:
 print("The total number of questions is {}.".format(NQ))
 
 # Load entity tags
-with open(r'./external/medqa_usmle_train_choices_annotation.json', 'r') as f:
+with open(r'/home/rpxian/Code/Python/medqa_usmle_train_choices_annotation.json', 'r') as f:
     annotations = json.load(f)
 annotations = np.array(annotations)[qad[type_selector]==True].tolist()
 
@@ -131,7 +129,7 @@ annotations = np.array(annotations)[qad[type_selector]==True].tolist()
 for i in tqdm(range(0, NQ)):
 
     qdict = qadf.iloc[i,:].to_dict()
-    qdict["prompt_prefix"] = "Imagine you are a biomedical expert. Answer the following question without explanation.\n[Context]: "
+    qdict["prompt_prefix"] = "Answer the following question without explanation.\n[Context]: "
 #     qdict["prompt_prefix"] = "[Context]: "
     qdict["prompt_suffix"] = "[Answer]: "
     qobj = qdata.question.Question.from_dict(qdict)
@@ -161,8 +159,7 @@ for i in tqdm(range(0, NQ)):
     current_annotation = {k:annotation[k] for k in current_distractors.keys()}
 
     answ = qobj.query(model, tokenizer, model_kwargs={"max_new_tokens":128,
-                                                      "do_sample":True,
-                                                      "temperature":TEMP})
+                                                      "do_sample":True})
     answ = split_answer(answ)
     flag = soft_validate(answ, qobj.answer_idx) # Check if answer is true
     
@@ -213,8 +210,7 @@ for i in tqdm(range(0, NQ)):
             qobj.options[choice_id] = opt_text_modified
             
             answ = qobj.query(model, tokenizer, model_kwargs={"max_new_tokens":128,
-                                                              "do_sample":True,
-                                                              "temperature":TEMP})
+                                                              "do_sample":True})
             answ = split_answer(answ)
             flag = soft_validate(answ, qobj.answer_idx) # Check if answer is true
             
@@ -235,6 +231,6 @@ anscoll.add_collection(collection=qadf.iloc[:NQ,:]['answer'].values,
 
 print(anscoll.answers['flag'].sum()/NQ)
 if not PERTURB:
-    anscoll.to_excel("./hf_{}_{}_{}_temp={}.xlsx".format(modstr, GROUP, NQ, TEMP))
+    anscoll.to_excel("./hf_{}_{}_{}_temp={}.xlsx".format(modstr, GROUP, NQ))
 else:
     anscoll.to_excel("./hf_{}_{}_perturb_{}_inv{}_{}.xlsx".format(modstr, PTB_SAMP, GROUP, NDIST, NQ))
