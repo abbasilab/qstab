@@ -7,7 +7,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "qstab"
-authors = [{name = "people", email = "abbasilabucsf@gmail.com"}]
+authors = [{name = "people", email = "xyz@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
