@@ -22,7 +22,7 @@ Here 6000 is just a large enough number such that all instances are run.
 
 ### Run entity substitution attack
 
-The substitution attack targets entities in the distractors of the question. Using a sampling-based approach, the attacker selects a replacement entity to substitute the original one that exist in the instance of the dataset.
+The substitution attack targets entities in the distractors of the question by constructing **adversarial distractors**. Using a sampling-based approach, the attacker selects a replacement entity to substitute the original one that exist in the instance of the dataset.
 
 * **Random sampling**
 
