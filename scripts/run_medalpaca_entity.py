@@ -87,31 +87,30 @@ if PERTURB: # With perturbation
         tknzer = AutoTokenizer.from_pretrained("GanjinZero/UMLSBert_ENG")
         mod = AutoModel.from_pretrained("GanjinZero/UMLSBert_ENG")
         if GROUP == 'drugs':
-            vecs = np.load(r'/home/rpxian/Code/Python/drug_word_vecs_umlsBERT.npz')['vecs']
+            vecs = np.load(r'./external/drug_word_vecs_umlsBERT.npz')['vecs']
         elif GROUP == 'diseases':
-            vecs = np.load(r'/home/rpxian/Code/Python/disease_word_vecs_umlsBERT.npz')['vecs']
+            vecs = np.load(r'./external/disease_word_vecs_umlsBERT.npz')['vecs']
 else: # No perturbation
     anscoll = qdata.question.AnswerCollector(colnames=['mod_ans', 'flag'])
 
 
 # Load perturbation set
 if GROUP == 'drugs':
-    entities = pd.read_csv(r'/home/rpxian/Code/Python/FDA_Approved.csv', names=['id', 'name'])
+    entities = pd.read_csv(r'./external/FDA_Approved.csv', names=['id', 'name'])
     entity_names = np.array(list(entities['name']))
     type_selector = 'Drugs?'
     choice_type = 'DrugChoices'
     tui_types = tui_drugs
 
 elif GROUP == 'diseases':
-    entities = pd.read_csv(r'/home/rpxian/Code/Python/CTD_unique_disease_names.csv')
+    entities = pd.read_csv(r'./external/CTD_unique_disease_names.csv')
     entity_names = np.array(list(entities['name']))
     type_selector = 'Diseases?'
     choice_type = 'DiseaseChoices'
     tui_types = tui_diseases
 
 # Load dataset
-# qa = pd.read_parquet(r'./external/train_drugs.parquet')
-qa = pd.read_parquet(r'/home/rpxian/Code/Python/medqa_usmle_train_qtyped.parquet')
+qa = pd.read_parquet(r'./external/medqa_usmle_train_typed.parquet')
 qad = qdata.formatter.Formatter(qa).df
 qadf = qad[qad[type_selector]==True] # Select the disease or drug-related questions
 nqs = len(qadf)
@@ -121,7 +120,7 @@ if NQ > nqs:
 print("The total number of questions is {}.".format(NQ))
 
 # Load entity tags
-with open(r'/home/rpxian/Code/Python/medqa_usmle_train_choices_annotation.json', 'r') as f:
+with open(r'./external/medqa_usmle_train_choices_annotation.json', 'r') as f:
     annotations = json.load(f)
 annotations = np.array(annotations)[qad[type_selector]==True].tolist()
 

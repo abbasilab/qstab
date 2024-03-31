@@ -106,8 +106,7 @@ elif GROUP == 'diseases':
     tui_types = tui_diseases
 
 # Load dataset
-# qa = pd.read_parquet(r'./external/train_drugs.parquet')
-qa = pd.read_parquet(r'./external/medqa_usmle_train_qtyped.parquet')
+qa = pd.read_parquet(r'./external/medqa_usmle_train_typed.parquet')
 qad = qdata.formatter.Formatter(qa).df
 qadf = qad[qad[type_selector]==True] # Select the disease or drug-related questions
 nqs = len(qadf)
