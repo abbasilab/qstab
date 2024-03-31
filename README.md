@@ -12,7 +12,7 @@ Clone the code repo. Go to the qstab folder, install using the following from th
 
 The code are under the scripts folder. Under the qstab folder, type the following from the command line
 
-Run Flan-T5-large model on MedQA-USMLE drug-mention questions
+Run Flan-T5-large model on [MedQA-USMLE](https://huggingface.co/datasets/GBaker/MedQA-USMLE-4-options-hf-MPNet-IR) drug-mention questions
 <pre><code class="console"> python ./scripts/run_hf_entity.py -grp="drugs" -nq=6000 </code></pre>
 
 Run MedAlpaca-7B model on MedQA-USMLE disease-mention questions
@@ -22,17 +22,17 @@ Here 6000 is just a large enough number such that all instances are run.
 
 ### Run entity substitution attack
 
-**Random sampling**
+* **Random sampling**
 
 Using the Flan-T5-large model on MedQA-USMLE drug-mention questions
 <pre><code class="console"> python ./scripts/run_hf_entity.py -ptb=True -ptb_samp="random" -grp="drugs" -nq=6000 </code></pre>
 
-**Powerscale distance-weighted sampling (PDWS)**
+* **Powerscale distance-weighted sampling (PDWS)**
 
 Using the Flan-T5-large model on MedQA-USMLE drug-mention questions
 <pre><code class="console"> python ./scripts/run_hf_entity.py -ptb=True -ptb_samp="distance" -grp="drugs" -ndist=20 -nq=6000 </code></pre>
 
-**Hyperparameter tuning for PDWS**
+* **Hyperparameter tuning for PDWS**
 
 Using the Flan-T5-large model on MedQA-USMLE drug-mention questions
 <pre><code class="console"> bash ./scripts/flant5_large_tune.sh </code></pre>
