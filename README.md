@@ -26,15 +26,15 @@ The substitution attack targets entities in the distractors of the question. Usi
 
 * **Random sampling**
 
-Using the Flan-T5-large model on MedQA-USMLE drug-mention questions
-<pre><code class="console"> python ./scripts/run_hf_entity.py -ptb=True -ptb_samp="random" -grp="drugs" -nq=6000 </code></pre>
+An example to attack the MedAlpaca-7B model on MedQA-USMLE drug-mention questions using random sampling.
+<pre><code class="console"> python ./scripts/run_medalpaca_entity.py -ptb=True -ptb_samp="random" -grp="drugs" -nq=6000 </code></pre>
 
 * **Powerscale distance-weighted sampling (PDWS)**
 
-Using the Flan-T5-large model on MedQA-USMLE drug-mention questions
-<pre><code class="console"> python ./scripts/run_hf_entity.py -ptb=True -ptb_samp="distance" -grp="drugs" -ndist=20 -nq=6000 </code></pre>
+An example to attack the MedAlpaca-7B model on MedQA-USMLE drug-mention questions using PDWS.
+<pre><code class="console"> python ./scripts/run_medalpaca_entity.py -ptb=True -ptb_samp="distance" -grp="drugs" -ndist=20 -nq=6000 </code></pre>
 
 * **Hyperparameter tuning for PDWS**
 
-Using the Flan-T5-large model on MedQA-USMLE drug-mention questions
-<pre><code class="console"> bash ./scripts/flant5_large_tune.sh </code></pre>
+An example to tune the PDWS attacker's hyperparameter for the MedAlpaca-7B model on MedQA-USMLE drug-mention questions
+<pre><code class="console"> bash ./scripts/medalpaca_tune.sh </code></pre>
