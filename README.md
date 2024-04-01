@@ -1,6 +1,6 @@
-## Question answering robustness benchmark
+## Biomedical question answering robustness benchmark
 
-The repo includes code to assess the robustness of language models trained for biomedical question answering (QA).
+The repo includes code to assess the robustness of large language models (LLMs) in biomedical question answering (QA). A collection of generalist and specialist LLMs are assessed.
 
 ### Installation
 
