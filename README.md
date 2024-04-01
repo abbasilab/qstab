@@ -4,7 +4,7 @@ The repo includes code to assess the robustness of language models trained for b
 
 ### Installation
 
-Clone the code repo. Go to the qstab folder, install using the following from the command line
+Clone the code repo. Go to the `qstab` folder, install using the following from the command line
 
 <pre><code class="console"> pip install . </code></pre>
 
